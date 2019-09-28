@@ -1,14 +1,8 @@
 <?php
 return [
-    'supported_lang' => ['en', 'cn'],
-    'zuggr_cloud' => [
-        'send' => [
-            'email' => [
-                'host_password' => '123',
-                'template' => [
-                    'validation' => 123
-                ]
-            ]
-        ]
+    'user_types' => [
+        'sponsor' => 0,
+        'user' => 1,
+        'authority' => 2
     ]
 ];

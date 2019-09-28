@@ -25,3 +25,31 @@ $router->group(['prefix' => 'passport'], function ($router) {
         $router->get('', 'PassportController@index');
     });
 });
+
+$router->group(['prefix' => 'coupon'], function ($router) {
+    $router->post('register', 'CouponController@register');
+
+    $router->put('consume/{sponsor_id}', 'CouponController@consume');
+
+    $router->delete('{id}', 'CouponController@delete');
+
+    $router->get('{id}', 'CouponController@view');
+
+    $router->put('{id}', 'CouponController@put');
+
+    $router->get('', 'CouponController@index');
+});
+
+$router->group(['prefix' => 'survey'], function ($router) {
+    $router->group(['prefix' => 'template'], function ($router) {
+        $router->post('register', 'SurveyTemplateController@register');
+
+        $router->delete('{id}', 'SurveyTemplateController@delete');
+
+        $router->get('{id}', 'SurveyTemplateController@view');
+
+        $router->put('{id}', 'SurveyTemplateController@put');
+
+        $router->get('', 'SurveyTemplateController@index');
+    });
+});

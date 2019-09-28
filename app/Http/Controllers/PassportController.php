@@ -44,24 +44,13 @@ class PassportController extends Controller
 
         $this->validator($content, [
             'email' => 'email',
-            'password' => ['required', 'string', 'min:6'],
-            'credentials' => 'array'
+            'password' => ['required', 'string', 'min:6']
         ]);
-
-        if (isset($content['credentials'])) {
-            $this->validator($content['credentials'], [
-                //
-            ]);
-
-            $content['credentials'] = Helpers::only($content['data'], [
-                //
-            ]);
-        }
 
         try {
             $oauth = $this->cloud->post(
                 'resource/passport/oauth/login',
-                Helpers::only($content, ['email', 'password', 'credentials'])
+                Helpers::only($content, ['email', 'password'])
             );
         } catch (\Exception $e) {
             app(ErrorHelpers::class)->throw(1003, $e);
@@ -84,16 +73,14 @@ class PassportController extends Controller
             'code' => 'required|string'
         ]);
 
-        $this->validator($content['credentials'], [
-            //
-        ]);
-
         $this->validator($content['data'], [
-            //
+            'name' => 'required|string',
+            'type' => 'required|integer',
+            'consumed_meal_name' => 'required|string'
         ]);
 
         $content['data'] = Helpers::only($content['data'], [
-            //
+            'name', 'type', 'consumed_meal_name'
         ]);
         
         $content['credentials'] = Helpers::only($content['data'], [
@@ -168,15 +155,6 @@ class PassportController extends Controller
         ]));
     }
 
-    public function deleteBatch(Request $request)
-    {
-        $content = $this->getContent($request);
-
-        $this->idsValidator($content, 'users');
-
-        $this->cloud->delete('resource/passport', $content);
-    }
-
     public function delete(Request $request, $id)
     {
         $content = $this->getContent($request);
@@ -198,44 +176,18 @@ class PassportController extends Controller
         ]);
 
         $this->validator($content['data'], [
-            //
+            'name' => 'required|string',
+            'consumed_meal_name' => 'required|string'
         ]);
 
-        // some default values
-        $content[$id]['data']['foo'] = 'bar';
-        // some cannot be changed
-        $content['data']['foo'] = $request->user()->data['foo'];
+        $content['data'] = Helpers::only($content['data'], [
+            'name', 'type', 'consumed_meal_name'
+        ]);
 
         return $this->cloud->put('resource/passport/'.$id, array_merge(
             ['token' => $request->user()->token],
             Helpers::only($content, ['data'])
         ));
-    }
-
-    public function putBatch(Request $request)
-    {
-        $content = $this->getContent($request);
-
-        $this->batchValidator($content, 'users', [
-            'data' => 'array'
-        ]);
-
-        foreach ($content['users'] as $id => $user) {
-            $this->validator($user['data'], [
-                //
-            ]);
-
-            $this->validator($user['credentials'], [
-                //
-            ]);
-
-            // some default values
-            $content[$id]['data']['foo'] = 'bar';
-            // some cannot be changed
-            $content['data']['foo'] = $request->user()->data['foo'];
-        }
-
-        return $this->cloud->put('resource/passport', $content);
     }
 
     public function putCredentials(Request $request, $id)
@@ -255,8 +207,9 @@ class PassportController extends Controller
             ]);
         }
 
-        // some default values
-        $content['credentials']['foo'] = 'bar';
+        $content['credentials'] = Helpers::only($content['credentials'], [
+            //
+        ]);
 
         return $this->cloud->put('resource/passport/'.$id.'/credentials', array_merge(
             ['token' => $request->user()->token],
