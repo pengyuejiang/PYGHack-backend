@@ -16,7 +16,9 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         InitApp::class,
-        InitGit::class
+        InitGit::class,
+        RegisterEmailTemplate::class,
+        RegisterEmailConfig::class
     ];
 
     /**
