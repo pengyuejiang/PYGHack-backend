@@ -1,0 +1,11 @@
+/vendor
+/.idea
+Homestead.json
+Homestead.yaml
+.env
+app/Models/.DS_Store
+.DS_Store
+storage/docs/*
+!storage/docs/.gitkeep
+.tmp_staging
+storage/logs/*
