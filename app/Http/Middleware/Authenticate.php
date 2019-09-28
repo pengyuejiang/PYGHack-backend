@@ -55,8 +55,6 @@ class Authenticate
                 app(ErrorHelpers::class)->throw(1001, $e);
             }
 
-            return $user;
-
             Helpers::putCache(
                 'passport',
                 'uid',
