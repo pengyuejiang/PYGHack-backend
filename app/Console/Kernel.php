@@ -6,6 +6,8 @@ use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\InitApp;
 use App\Console\Commands\InitGit;
+use App\Console\Commands\RegisterEmailTemplate;
+use App\Console\Commands\RegisterEmailConfig;
 
 class Kernel extends ConsoleKernel
 {
