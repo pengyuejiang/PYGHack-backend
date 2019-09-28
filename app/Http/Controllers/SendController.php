@@ -33,7 +33,7 @@ class SendController extends Controller
                 array_merge(
                     Helpers::only($content, ['email', 'cache']),
                     [
-                        'lang' => $content['site']['lang'],
+                        'lang' => 'en',
                         'host_password' => \env('EMAIL_CONFIG_PASSWORD'),
                         'template_id' => \env('VALIDATION_CODE_EMAIL_TEMPLATE_ID'),
                         'expire_at' => Carbon::now()->addMinutes(20)->format('Y-m-d H:i:s')

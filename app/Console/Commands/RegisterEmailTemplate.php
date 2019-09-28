@@ -45,10 +45,18 @@ class RegisterEmailTemplate extends Command
     public function handle()
     {
         $localTemplates = config('constant.email_templates');
-        $templates = $this->cloud->get(
-            'app/send/email/template',
-            ['page' => 1, 'pre-page' => 9999999]
-        )['app_email_templates'];
+
+        try {
+            $templates = $this->cloud->get(
+                'app/send/email/template',
+                ['page' => 1, 'pre-page' => 9999999]
+            );
+        } catch (\Exception $e) {
+            $response = $e->getResponse();
+            dd((string)$response->getBody());
+        }
+
+        $templates = $templates['app_email_templates'];
         foreach ($templates as $template) {
             $this->cloud->delete('app/send/email/template/'.$template['id']);
         }

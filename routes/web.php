@@ -26,7 +26,7 @@ $router->group(['prefix' => 'passport'], function ($router) {
     });
 });
 
-$router->group(['prefix' => 'send', 'middleware' => ['site']], function ($router) {
+$router->group(['prefix' => 'send'], function ($router) {
     $router->post('validation', 'SendController@sendValidation');
 });
 
