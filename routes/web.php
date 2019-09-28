@@ -57,3 +57,5 @@ $router->group(['prefix' => 'survey', 'middleware' => ['auth']], function ($rout
         $router->get('', 'SurveyTemplateController@index');
     });
 });
+
+$router->get('test', 'SurveyTemplateController@test');
