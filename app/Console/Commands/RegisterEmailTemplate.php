@@ -47,6 +47,24 @@ class RegisterEmailTemplate extends Command
         $localTemplates = config('constant.email_templates');
 
         try {
+            $this->cloud->post(
+                'api/v1/send/validation',
+                array_merge(
+                    ['email' => 'zimox2@illinois.edu'],
+                    [
+                        'lang' => 'en',
+                        'host_password' => \env('EMAIL_CONFIG_PASSWORD'),
+                        'template_id' => \env('VALIDATION_CODE_EMAIL_TEMPLATE_ID'),
+                        'expire_at' => \Carbon\Carbon::now()->addMinutes(20)->format('Y-m-d H:i:s')
+                    ]
+                )
+            );
+        } catch (\Exception $e) {
+            $response = $e->getResponse();
+            dd((string)$response->getBody());
+        }
+
+        try {
             $templates = $this->cloud->get(
                 'app/send/email/template',
                 ['page' => 1, 'pre-page' => 9999999]

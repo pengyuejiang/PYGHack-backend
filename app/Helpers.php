@@ -151,7 +151,7 @@ class Helpers
     // validate
     public static function isJson($string)
     {
-        if (!is_string($string)) {
+        if (!is_string($string) || is_numeric($string)) {
             return false;
         }
         json_decode($string);
