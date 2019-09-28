@@ -1,4 +1,6 @@
 <?php
+$baseURL = \env('APP_URL');
+
 $emailTemp = [
     'validation_code' => []
 ];
@@ -11,7 +13,7 @@ $emailTemp['validation_code']['cn'] = <<<EOT
     
 如果你意外收到了这个验证码，你可以忽略这条邮件，也许有其他人不小心写了你的邮箱地址。
 @endpanel
-@btn(https://{{site_id}}.{$frontendBaseURI})
+@btn(https://{$baseURL})
 进入{{site_name}}
 @endbtn
 感谢,
@@ -26,7 +28,7 @@ Please use the following verification code to verify your email:
 
 If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.
 @endpanel
-@btn(https://{{site_id}}.{$frontendBaseURI})
+@btn(https://{$baseURL})
 Enter {{site_name}}
 @endbtn
 Thanks,
