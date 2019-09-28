@@ -45,7 +45,6 @@ class PassportController extends Controller
         $this->validator($content, [
             'email' => 'email',
             'password' => ['required', 'string', 'min:6'],
-            'credentials' => 'required|array',
             'data' => 'required|array',
             'code' => 'required|string'
         ]);
@@ -62,9 +61,7 @@ class PassportController extends Controller
             'name', 'type', 'meal_name'
         ]);
         
-        $content['credentials'] = Helpers::only($content['credentials'], [
-            //
-        ]);
+        $content['credentials'] = [];
 
         return $this->cloud->post(
             'api/v1/passport/oauth/register',
@@ -98,11 +95,10 @@ class PassportController extends Controller
         $this->validator($content, [
             'email' => 'email',
             'data' => 'array',
-            'credentials' => 'array',
         ]);
 
         $user = $this->cloud->get('api/v1/passport', array_merge(
-            Helpers::only($content, ['email', 'data', 'credentials']),
+            Helpers::only($content, ['email', 'data']),
             [
                 'per-page' => 1,
                 'page' => 1
@@ -122,7 +118,6 @@ class PassportController extends Controller
         $this->validator($content, [
             'email' => 'email',
             'data' => 'array',
-            'credentials' => 'array',
             'page' => 'required|integer',
             'per-page' => 'integer',
             'order' => 'string',
@@ -130,7 +125,7 @@ class PassportController extends Controller
         ]);
 
         return $this->cloud->get('api/v1/passport', Helpers::only([
-            'email', 'data', 'credentials', 'page', 'per-page', 'order', 'by'
+            'email', 'data', 'page', 'per-page', 'order', 'by'
         ]));
     }
 
@@ -174,25 +169,14 @@ class PassportController extends Controller
         $content = $this->getContent($request);
 
         $this->validator($content, [
-            'credentials' => 'array',
             'email' => 'email',
             'password' => ['string', 'min:6'],
             'code' => 'required|string'
         ]);
 
-        if (isset($content['credentials'])) {
-            $this->validator($content['credentials'], [
-                //
-            ]);
-        }
-
-        $content['credentials'] = Helpers::only($content['credentials'], [
-            //
-        ]);
-
         return $this->cloud->put('api/v1/passport/'.$id.'/credentials', array_merge(
             ['token' => $request->user()->token],
-            Helpers::only($content, ['credentials', 'email', 'password', 'code'])
+            Helpers::only($content, ['email', 'password', 'code'])
         ), false);
     }
 }
