@@ -13,11 +13,11 @@ $emailTemp['validation_code']['cn'] = <<<EOT
     
 如果你意外收到了这个验证码，你可以忽略这条邮件，也许有其他人不小心写了你的邮箱地址。
 @endpanel
-@btn(https://{$baseURL})
-进入{{site_name}}
+@btn({$baseURL})
+进入OneMoreMeal
 @endbtn
 感谢,
-{{site_name}}团队
+OneMoreMeal团队
 EOT;
 
 $emailTemp['validation_code']['en'] = <<<EOT
@@ -28,11 +28,11 @@ Please use the following verification code to verify your email:
 
 If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.
 @endpanel
-@btn(https://{$baseURL})
-Enter {{site_name}}
+@btn({$baseURL})
+Enter OneMoreMeal
 @endbtn
 Thanks,
-{{site_name}} Team
+OneMoreMeal Team
 EOT;
 
 return [
