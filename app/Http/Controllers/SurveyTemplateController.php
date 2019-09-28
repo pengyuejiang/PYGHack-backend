@@ -89,9 +89,4 @@ class SurveyTemplateController extends Controller
 
         return app(SurveyTemplate::class)->del($id);
     }
-
-    public function test(Request $request)
-    {
-        return $request->session()->get('token');
-    }
 }
