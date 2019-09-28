@@ -6,32 +6,16 @@ use App\Helpers\ErrorHelpers;
 use Illuminate\Http\Request;
 use App\Models\Coupon;
 use Carbon\Carbon;
+use ZuggrCloud\ZuggrCloud;
 
 class CouponController extends Controller
 {
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="coupon/register",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *              @OA\Property(property="sponsor_id",type="integer",example="123",description=""),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="sponsor_id",type="integer",example="123"),
-    *              @OA\Property(property="is_consumed",type="boolean",example="false"),
-    *              @OA\Property(property="consumed_by",type="integer",example="123"),
-    *              @OA\Property(property="consumed_at",type="timestamp",example="2019-09-28 02:04:48.870742 UTC (+00:00)"),
-    *              @OA\Property(property="consumed_meal_name",type="string",example="BIGMAC"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
+    protected $cloud;
+
+    public function __construct(ZuggrCloud $cloud)
+    {
+        $this->cloud = $cloud;
+    }
 
     public function register(Request $request)
     {
@@ -50,85 +34,22 @@ class CouponController extends Controller
         ]);
     }
 
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="coupon/view",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\Parameter(
-    *          name="id",
-    *          in="path",
-    *          required=true,
-    *          @OA\Schema(
-    *              type="integer"
-    *          ),
-    *          example="123"
-    *      ),
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *              @OA\Property(property="sponsor_id",type="integer",example="123",description=""),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="sponsor_id",type="integer",example="123"),
-    *              @OA\Property(property="is_consumed",type="boolean",example="false"),
-    *              @OA\Property(property="consumed_by",type="integer",example="123"),
-    *              @OA\Property(property="consumed_at",type="timestamp",example="2019-09-28 02:04:48.870742 UTC (+00:00)"),
-    *              @OA\Property(property="consumed_meal_name",type="string",example="BIGMAC"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
-
-
     public function view(Request $request, $id)
     {
         $user = $request->user();
 
-        if ($user->data['type'] != config('constant')['user_types']['sponsor']) {
+        if ($user->data['type'] == config('constant')['user_types']['user']) {
             app(ErrorHelpers::class)->throw(1004);
         }
 
-        return app(Coupon::class)->view($id);
-    }
+        $out = app(Coupon::class)->view($id);
 
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="coupon/index",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\Parameter(
-    *          name="id",
-    *          in="path",
-    *          required=true,
-    *          @OA\Schema(
-    *              type="integer"
-    *          ),
-    *          example="123"
-    *      ),
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *               @OA\Property(property="page",type="integer",example="123",description=""),
-    *               @OA\Property(property="per-page",type="integer",example="123",description=""),
-    *               @OA\Property(property="order",type="string",example="name",description=""),
-    *               @OA\Property(property="by",type="string",example="desc",description=""),
-    *               @OA\Property(property="sponsor_id",type="array",example="[123,124]",description=""),
-    *               @OA\Property(property="consumed_by",type="array",example="[123,124]",description=""),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="count",type="integer",example="123"),
-    *              @OA\Property(property="coupon",type="json",example="{...}"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
+        if ($out['sponsor_id'] != $user->id && $user->data['type'] == config('constant')['user_types']['sponsor']) {
+            app(ErrorHelpers::class)->throw(1004);
+        }
+
+        return $out;
+    }
 
     public function index(Request $request, $id)
     {
@@ -142,6 +63,21 @@ class CouponController extends Controller
             'sponsor_id' => 'array',
             'consumed_by' => 'array'
         ]);
+
+        if ($user->data['type'] == config('constant')['user_types']['user']) {
+            app(ErrorHelpers::class)->throw(1004);
+        }
+
+        if ($user->data['type'] == config('constant')['user_types']['sponsor']) {
+            $this->validator($content, [
+                'sponsor_id' => 'required|array'
+            ]);
+            if (!in_array($user->id, $content['sponsor_id'])) {
+                app(ErrorHelpers::class)->throw(1004);
+            } elseif (count($content['sponsor_id']) > 1) {
+                app(ErrorHelpers::class)->throw(1004);
+            }
+        }
 
         list($page, $perPage, $order, $by) = $this->getIndexAttributes($content);
 
@@ -166,12 +102,18 @@ class CouponController extends Controller
         $this->validator($content, [
             'is_consumed' => 'required|boolean',
             'consumed_by' => 'required|integer',
-            'consumed_at' => 'timestamp',
             'consumed_meal_name'=>'string'
         ]);
+
         $user = $request->user();
 
-        if ($user->data['type'] != config('constant')['user_types']['sponsor']) {
+        if ($user->data['type'] == config('constant')['user_types']['user']) {
+            app(ErrorHelpers::class)->throw(1004);
+        }
+
+        $out = app(Coupon::class)->view($id);
+
+        if ($out['sponsor_id'] != $user->id && $user->data['type'] == config('constant')['user_types']['sponsor']) {
             app(ErrorHelpers::class)->throw(1004);
         }
 
@@ -182,33 +124,48 @@ class CouponController extends Controller
 
     public function consume(Request $request, $id)
     {
-        $content = $this->getContent($request);
-
-        $this->validator($content, [
-            'is_consumed' => 'required|boolean',
-            'consumed_by' => 'required|integer',
-            'consumed_at' => 'timestamp',
-            'consumed_meal_name'=>'string'
-        ]);
-
         $user = $request->user();
 
-        if ($user->data['type'] != config('constant')['user_types']['sponsor']) {
+        if ($user->data['type'] != config('constant')['user_types']['user']) {
             app(ErrorHelpers::class)->throw(1004);
-        }
-
-        return app(Coupon::class)->put($id, array_merge(Helpers::only($content, [
-            'is_consumed', 'consumed_by','consumed_meal_name'
-        ]), [
-            'consumed_at'=>Carbon::now()
-        ]));
+        };
+        
+        list($coupons, $count) = app(Coupon::class)->index(
+            [
+                'sponsor_id' => $id,
+                'is_consumed'=>false
+            ],
+            1,
+            1,
+            'created_at',
+            'asc'
+        );
+        
+        if (count($coupons) == 0) {
+            app(ErrorHelpers::class)->throw(3001);
+        };
+        
+        return app(Coupon::class)->put(
+            $coupon[0]['id'],
+            [
+                'is_consumed'=>true,
+                'consumed_by'=>$user->id,
+                'consumed_at'=>Carbon::now()
+            ]
+        );
     }
 
     public function delete(Request $request, $id)
     {
         $user = $request->user();
 
-        if ($user->data['type'] != config('constant')['user_types']['sponsor']) {
+        if ($user->data['type'] == config('constant')['user_types']['user']) {
+            app(ErrorHelpers::class)->throw(1004);
+        }
+
+        $out = app(Coupon::class)->view($id);
+
+        if ($out['sponsor_id'] != $user->id && $user->data['type'] == config('constant')['user_types']['sponsor']) {
             app(ErrorHelpers::class)->throw(1004);
         }
 

@@ -50,7 +50,7 @@ class Authenticate
 
         if (!($userID = Helpers::getCache('passport', 'uid', $token))) {
             try {
-                $user = $this->cloud->get('resource/passport/info', ['token' => $token]);
+                $user = $this->cloud->get('api/v1/passport/info', ['token' => $token]);
             } catch (\Exception $e) {
                 app(ErrorHelpers::class)->throw(1001, $e);
             }
@@ -63,7 +63,7 @@ class Authenticate
                 $user['id']
             );
         } else {
-            $user = $this->cloud->get('resource/passport/'.$userID, ['token' => $token]);
+            $user = $this->cloud->get('api/v1/passport/'.$userID, ['token' => $token]);
         }
 
         $user['token'] = $token;

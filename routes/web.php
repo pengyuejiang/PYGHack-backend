@@ -26,7 +26,11 @@ $router->group(['prefix' => 'passport'], function ($router) {
     });
 });
 
-$router->group(['prefix' => 'coupon'], function ($router) {
+$router->group(['prefix' => 'send', 'middleware' => ['site']], function ($router) {
+    $router->post('validation', 'SendController@sendValidation');
+});
+
+$router->group(['prefix' => 'coupon', 'middleware' => ['auth']], function ($router) {
     $router->post('register', 'CouponController@register');
 
     $router->put('consume/{sponsor_id}', 'CouponController@consume');
@@ -40,7 +44,7 @@ $router->group(['prefix' => 'coupon'], function ($router) {
     $router->get('', 'CouponController@index');
 });
 
-$router->group(['prefix' => 'survey'], function ($router) {
+$router->group(['prefix' => 'survey', 'middleware' => ['auth']], function ($router) {
     $router->group(['prefix' => 'template'], function ($router) {
         $router->post('register', 'SurveyTemplateController@register');
 

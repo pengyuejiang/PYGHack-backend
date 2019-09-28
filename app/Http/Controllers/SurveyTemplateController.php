@@ -9,28 +9,6 @@ use Carbon\Carbon;
 
 class SurveyTemplateController extends Controller
 {
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="survey/template/register",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *              @OA\Property(property="user_id",type="integer",example="123",description=""),
-    *              @OA\Property(property="body",type="json",example="{...}",description=""),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="user_id",type="integer",example="123"),
-    *              @OA\Property(property="body",type="json",example="{...}"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
-
     public function register(Request $request)
     {
         $content = $this->getContent($request);
@@ -46,78 +24,15 @@ class SurveyTemplateController extends Controller
         }
 
         return app(SurveyTemplate::class)->add([
-            'owner' => $user->id,
+            'owner_id' => $user->id,
             'body'=> Helpers::only($content, ['body'])
         ]);
     }
-
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="survey/template/view",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\Parameter(
-    *          name="id",
-    *          in="path",
-    *          required=true,
-    *          @OA\Schema(
-    *              type="integer"
-    *          ),
-    *          example="123"
-    *      ),
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *               @OA\Property(property="user_id",type="integer",example="123",description=""),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *                @OA\Property(property="user_id",type="integer",example="123"),
-    *                @OA\Property(property="body",type="json",example="{...}"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
 
     public function view(Request $request, $id)
     {
         return app(SurveyTemplate::class)->view($id);
     }
-
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="survey/template/index",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\Parameter(
-    *          name="id",
-    *          in="path",
-    *          required=true,
-    *          @OA\Schema(
-    *              type="integer"
-    *          ),
-    *          example="123"
-    *      ),
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *               @OA\Property(property="page",type="integer",example="123",description=""),
-    *               @OA\Property(property="per-page",type="integer",example="123",description=""),
-    *               @OA\Property(property="order",type="string",example="name",description=""),
-    *               @OA\Property(property="by",type="string",example="desc",description=""),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="body",type="json",example="{}"),
-    *              @OA\Property(property="count",type="integer",example="123"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
 
     public function index(Request $request)
     {
@@ -146,43 +61,13 @@ class SurveyTemplateController extends Controller
             'count' => $count
         ];
     }
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="survey/template/put",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\Parameter(
-    *          name="id",
-    *          in="path",
-    *          required=true,
-    *          @OA\Schema(
-    *              type="integer"
-    *          ),
-    *          example="123"
-    *      ),
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *               @OA\Property(property="user_id",type="integer",example="123",description=""),
-    *               @OA\Property(property="body",type="json",example="{}"),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="user_id",type="integer",example="123"),
-    *              @OA\Property(property="body",type="json",example="{...}"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
 
     public function put(Request $request, $id)
     {
         $content = $this->getContent($request);
 
         $this->validator($content, [
-            'body'=>'json'
+            'body'=>'array'
         ]);
 
         $user = $request->user();
@@ -193,37 +78,6 @@ class SurveyTemplateController extends Controller
 
         return app(SurveyTemplate::class)->put($id, Helpers::only($content, ['body']));
     }
-
-    /**
-    * phpcs:disable
-    * @OA\Post(
-    *      path="survey/template/delete",
-    *      tags={"passport"},
-    *      description="create new email template [scope:app]",
-    *      @OA\Parameter(
-    *          name="id",
-    *          in="path",
-    *          required=true,
-    *          @OA\Schema(
-    *              type="integer"
-    *          ),
-    *          example="123"
-    *      ),
-    *      @OA\RequestBody(
-    *          @OA\JsonContent(
-    *              @OA\Property(property="user_d",type="integer",example="123"),
-    *          ),
-    *      ),
-    *      @OA\Response(response="200",description="success",
-    *          @OA\JsonContent(
-    *              @OA\Property(property="user_id",type="integer",example="123"),
-    *              @OA\Property(property="body",type="json",example="{...}"),
-    *          ),
-    *      )
-    * )
-    * phpcs:enable
-    */
-
 
     public function delete(Request $request, $id)
     {

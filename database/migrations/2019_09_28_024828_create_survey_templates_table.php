@@ -13,11 +13,11 @@ class CreateSurveyTemplatesTable extends Migration
      */
     public function up()
     {
-        Schema::create('survey_template', function (Blueprint $table) {
+        Schema::create('survey_templates', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->unsignedInteger('owner_id')->nullable($value = true);
-            $table->json('body')->nullable($value = true);
+            $table->unsignedInteger('owner_id');
+            $table->json('body');
 
             // log
             $table->string('created_by')->nullable($value = true);

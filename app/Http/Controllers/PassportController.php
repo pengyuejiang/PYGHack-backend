@@ -15,29 +15,6 @@ class PassportController extends Controller
         $this->cloud = $cloud;
     }
 
-    /**
-     * phpcs:disable
-     * @OA\Post(
-     *      path="passport/login",
-     *      tags={"passport"},
-     *      description="create new email template [scope:app]",
-     *      @OA\RequestBody(
-     *          @OA\JsonContent(
-     *              @OA\Property(property="email",type="string",example="xiaozimo@zuggr.com",description=""),
-     *              @OA\Property(property="password",type="string",example="YourPass",description=""),
-     *              @OA\Property(property="credentials",type="json",example={"username": "foo"},description=""),
-     *          ),
-     *      ),
-     *      @OA\Response(response="200",description="success",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="token_type",type="string",example="Bearer"),
-     *              @OA\Property(property="access_token",type="string",example="eyJ0eXAiOiJKV1QiLCJhbGciOi..."),
-     *              @OA\Property(property="expires_in",type="number",example=86400),
-     *          ),
-     *      )
-     * )
-     * phpcs:enable
-     */
     public function login(Request $request)
     {
         $content = $this->getContent($request);
@@ -49,7 +26,7 @@ class PassportController extends Controller
 
         try {
             $oauth = $this->cloud->post(
-                'resource/passport/oauth/login',
+                'api/v1/passport/oauth/login',
                 Helpers::only($content, ['email', 'password'])
             );
         } catch (\Exception $e) {
@@ -76,19 +53,21 @@ class PassportController extends Controller
         $this->validator($content['data'], [
             'name' => 'required|string',
             'type' => 'required|integer',
-            'consumed_meal_name' => 'required|string'
+            'meal_name' => 'string'
+        ], [
+            'meal_name' => null
         ]);
 
         $content['data'] = Helpers::only($content['data'], [
-            'name', 'type', 'consumed_meal_name'
+            'name', 'type', 'meal_name'
         ]);
         
-        $content['credentials'] = Helpers::only($content['data'], [
+        $content['credentials'] = Helpers::only($content['credentials'], [
             //
         ]);
 
         return $this->cloud->post(
-            'resource/passport/oauth/register',
+            'api/v1/passport/oauth/register',
             Helpers::only($content, ['email', 'password', 'credentials', 'data', 'code'])
         );
     }
@@ -101,7 +80,7 @@ class PassportController extends Controller
     public function forget(Request $request, $id)
     {
         $this->cloud->delete(
-            'resource/passport/'.$id.'/forget',
+            'api/v1/passport/'.$id.'/forget',
             ['token' => $request->user()->token]
         );
 
@@ -122,7 +101,7 @@ class PassportController extends Controller
             'credentials' => 'array',
         ]);
 
-        $user = $this->cloud->get('resource/passport', array_merge(
+        $user = $this->cloud->get('api/v1/passport', array_merge(
             Helpers::only($content, ['email', 'data', 'credentials']),
             [
                 'per-page' => 1,
@@ -150,7 +129,7 @@ class PassportController extends Controller
             'by' => 'string|in:desc,asc'
         ]);
 
-        return $this->cloud->get('resource/passport', Helpers::only([
+        return $this->cloud->get('api/v1/passport', Helpers::only([
             'email', 'data', 'credentials', 'page', 'per-page', 'order', 'by'
         ]));
     }
@@ -162,7 +141,7 @@ class PassportController extends Controller
         $this->idsValidator($content, 'users');
 
         $this->cloud->delete(
-            'resource/passport/'.$id,
+            'api/v1/passport/'.$id,
             ['token' => $request->user()->token]
         );
     }
@@ -177,14 +156,14 @@ class PassportController extends Controller
 
         $this->validator($content['data'], [
             'name' => 'required|string',
-            'consumed_meal_name' => 'required|string'
+            'meal_name' => 'string'
         ]);
 
         $content['data'] = Helpers::only($content['data'], [
-            'name', 'type', 'consumed_meal_name'
+            'name', 'type', 'meal_name'
         ]);
 
-        return $this->cloud->put('resource/passport/'.$id, array_merge(
+        return $this->cloud->put('api/v1/passport/'.$id, array_merge(
             ['token' => $request->user()->token],
             Helpers::only($content, ['data'])
         ));
@@ -211,7 +190,7 @@ class PassportController extends Controller
             //
         ]);
 
-        return $this->cloud->put('resource/passport/'.$id.'/credentials', array_merge(
+        return $this->cloud->put('api/v1/passport/'.$id.'/credentials', array_merge(
             ['token' => $request->user()->token],
             Helpers::only($content, ['credentials', 'email', 'password', 'code'])
         ), false);

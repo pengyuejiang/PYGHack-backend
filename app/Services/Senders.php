@@ -22,7 +22,7 @@ class Senders
         array $titleData = [],
         array $bodyData = []
     ): void {
-        $this->cloud->post('resource/send/validation', [
+        $this->cloud->post('api/v1/send/validation', [
             'lang' => $lang,
             'email' => $email,
             'template_id' => \config('constant.zuggr_cloud.send.email.template.validation'),
@@ -41,7 +41,7 @@ class Senders
         array $titleData = [],
         array $bodyData = []
     ): void {
-        $this->cloud->post('resource/send/email', [
+        $this->cloud->post('api/v1/send/email', [
             'lang' => $lang,
             'email' => $email,
             'template_id' => \config('constant.zuggr_cloud.send.email.template.'.$template),
